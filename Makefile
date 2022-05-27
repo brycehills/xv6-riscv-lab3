@@ -132,7 +132,7 @@ UPROGS=\
 	$U/_grind\
 	$U/_wc\
 	$U/_zombie\	
-	$U/frisbee\ 	#lab3
+	$U/frisbee\ 	
 
 
 fs.img: mkfs/mkfs README $(UPROGS)
