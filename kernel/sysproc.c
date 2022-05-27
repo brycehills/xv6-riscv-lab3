@@ -8,6 +8,42 @@
 #include "proc.h"
 
 uint64
+sys_clone(void)
+{
+  void *stack;
+  void *func;
+  void *arg;
+  int size;
+
+  if(argstr(0,(char*)(&stack),sizeof(stack)) < 0)
+  {
+      return -1;
+  }
+  if(argint(1,&size)<0)
+  {
+      return -1;
+  }
+  if(argstr(3,(char*)(&func),sizeof(func)) < 0)
+  [
+      return -1;
+  ]
+  if(argstr(0,(char*)(&arg),sizeof(arg)) < 0)
+  {
+      return -1;
+  }
+
+  return clone((*void)stack, size,(void*)func, (void*)size);
+
+}
+
+uint64
+sys_close_thread(void)
+{
+    close_thread();
+    return 0;
+}
+
+uint64
 sys_exit(void)
 {
   int n;
