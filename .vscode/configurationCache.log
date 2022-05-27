@@ -1,0 +1,1 @@
+{"buildTargets":[".PRECIOUS","kernel/kernel","mkfs/mkfs","tags","user/_forktest","user/initcode","user/usys.S","user/usys.o"],"launchTargets":[],"customConfigurationProvider":{"workspaceBrowse":{"browsePath":[],"compilerArgs":[]},"fileIndex":[]}}

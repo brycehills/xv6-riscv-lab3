@@ -1,0 +1,7 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory `/Users/shubham/Documents/UCR MSCS/Spring 22/CS 202/Labs/xv6-riscv-lab3'
+ 
+make: Leaving directory `/Users/shubham/Documents/UCR MSCS/Spring 22/CS 202/Labs/xv6-riscv-lab3'
+ 
+Makefile:135: *** commands commence before first target.  Stop.
+

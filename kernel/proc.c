@@ -318,6 +318,109 @@ fork(void)
   return pid;
 }
 
+// Clone function
+int clone (void *stack,int size,void*(func)(void*),void *arg)
+{	
+	int i,pid;
+	struct proc *np;
+	struct proc *p = myproc();
+	// Allocate process.
+	if((np = allocproc()) == 0){
+		return -1;
+	}
+	if((uint64)stack%PGSIZE != 0 || stack == 0) {
+		return -1;
+	}
+	
+	// share same address space with parent
+	np->state = UNUSED;
+	np->sz = p->sz;
+	*(np->trapframe) = *(p->trapframe);
+	np->pagetable = p->pagetable;
+	
+	np->context.ra = (uint64)func;
+	np->trapframe->a0 = 0;
+	
+	// use the same file descriptor
+	for(i=0;i<NOFILE;i++)
+	{
+		if(p->ofile[i])
+		{
+			np->ofile[i] = filedup(p->ofile[i]);
+		}
+		np->cwd = idup(p->cwd);
+	}
+	safestrcpy(np->name,p->name,sizeof(p->name));
+	
+	uint64 ustack[2];
+	ustack[0] = 0xffffffff;
+	ustack[1] = (uint64)arg;
+	
+	np->context.sp = (uint64)(stack+PGSIZE-4);
+	*((uint64*)(np->context.sp)) = (uint64)arg;
+	*((uint64*)(np->context.sp)-4) = 0xFFFFFFFF;
+	np->context.sp = (np->context.sp) - 4;
+	
+	if(copyout(np->pagetable,np->context.sp,(char*)ustack,size)<0)
+	{
+		printf("Stack copy failed\n");
+		return -1;
+	}
+	np->state = RUNNABLE;
+	
+	pid = np->pid;
+	release(&np->lock);
+	
+	acquire(&wait_lock);
+	np->parent = p;
+	release(&wait_lock);
+
+	acquire(&np->lock);
+	np->state = RUNNABLE;
+	release(&np->lock);
+
+	return pid;
+	
+	
+}
+
+
+
+void close_thread(void)
+{
+	int fd;
+	struct proc *p = myproc();
+	
+	if(p == initproc)
+	{
+		panic("init exiting");
+	}
+	// Close all open files.
+	for(fd=0;fd<NOFILE;fd++)
+	{
+		if(p->ofile[fd])
+		{
+			struct file *f = p->ofile[fd];
+			fileclose(f);
+			p->ofile[fd]=0;
+		}
+	}
+	
+	begin_op();
+	iput(p->cwd);
+	end_op();
+	p->cwd = 0;
+	// Parent might be sleeping in wait().
+	acquire(&wait_lock);
+	wakeup(p->parent);
+	
+	p->state = ZOMBIE;
+	release(&wait_lock);
+	sched();
+	panic("zombie exit");
+}
+
+
 // Pass p's abandoned children to init.
 // Caller must hold wait_lock.
 void
