@@ -24,9 +24,9 @@ sys_clone(void)
       return -1;
   }
   if(argstr(3,(char*)(&func),sizeof(func)) < 0)
-  [
+  {
       return -1;
-  ]
+  }
   if(argstr(0,(char*)(&arg),sizeof(arg)) < 0)
   {
       return -1;
