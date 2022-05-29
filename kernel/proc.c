@@ -335,7 +335,7 @@ int clone (void *stack,int size,void*(func)(void*),void *arg)
 	// share same address space with parent
 	np->state = UNUSED;
 	np->sz = p->sz;
-	*(np->trapframe) = *(p->trapframe);
+	*(np->trapframe) = *(p->trapframe - PGSIZE*np->pid);
 	np->pagetable = p->pagetable;
 	
 	np->context.ra = (uint64)func;

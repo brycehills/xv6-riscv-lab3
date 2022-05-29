@@ -3,6 +3,7 @@
 #include "user/user.h"
 #include "kernel/spinlock.h"
 #include "kernel/fcntl.h"
+#include "user/thread.h"
 
 int thread_create(void *(start_routine)(void*), void *arg)
 {
@@ -27,7 +28,6 @@ int thread_create(void *(start_routine)(void*), void *arg)
 
 }
 
-void lock_init(lock_t* lock)
 {
     lock->locked = 0;
 }
